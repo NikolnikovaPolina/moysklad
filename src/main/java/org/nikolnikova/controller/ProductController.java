@@ -3,13 +3,12 @@ package org.nikolnikova.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.nikolnikova.entity.Product;
-import org.nikolnikova.service.ProductService;
+import org.nikolnikova.service.interfaces.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Collection;
 import java.util.UUID;
 
 @RestController
@@ -20,29 +19,27 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
-        Product createdProduct = productService.create(product);
-        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
+    public ResponseEntity<Product> add(@Valid @RequestBody Product product) {
+        return new ResponseEntity<>(productService.create(product), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<Collection<Product>> get() {
+        return new ResponseEntity<>(productService.get(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Product>> getProductById(@PathVariable UUID id) {
-        return ResponseEntity.ok(productService.getProductById(id));
+    public ResponseEntity<Product> get(@PathVariable("id") UUID id) {
+        return new ResponseEntity<>(productService.get(id), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Optional<Product>> updateProduct(@PathVariable UUID id, @Valid @RequestBody Product product) {
-        return ResponseEntity.ok(productService.updateProduct(id, product));
+    public ResponseEntity<Product> update(@PathVariable("id") UUID id, @Valid @RequestBody Product product) {
+        return new ResponseEntity<>(productService.update(id, product), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
-        productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Boolean> delete(@PathVariable("id") UUID id) {
+        return new ResponseEntity<>(productService.delete(id), HttpStatus.OK);
     }
 }
