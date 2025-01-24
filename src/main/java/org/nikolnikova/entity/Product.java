@@ -23,7 +23,7 @@ import java.util.UUID;
 public class Product {
 
     @Id
-    private UUID id = UUID.randomUUID();
+    private UUID id;
 
     @NotBlank(message = "Name is required")
     @Size(max = 255, message = "Name must not exceed 255 characters")

@@ -24,8 +24,44 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<Collection<Product>> get() {
-        return new ResponseEntity<>(productService.get(), HttpStatus.OK);
+    public ResponseEntity<Collection<Product>> get(
+            @RequestParam(value = "search_term", required = false) String searchTerm) {
+        return new ResponseEntity<>(
+                (searchTerm != null) ? productService.get(searchTerm) : productService.get(),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/price")
+    public ResponseEntity<Collection<Product>> get(
+            @RequestParam(value = "price", required = false) Double price,
+            @RequestParam(value = "sign", required = false) String sign,
+            @RequestParam(value = "min_price", required = false) Double minPrice,
+            @RequestParam(value = "max_price", required = false) Double maxPrice) {
+
+        return new ResponseEntity<>(
+                (price != null && sign != null) ? productService.get(price, sign)
+                        : (minPrice != null && maxPrice != null) ? productService.get(minPrice, maxPrice)
+                        : productService.get(),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/in_stock")
+    public ResponseEntity<Collection<Product>> get(@RequestParam(value = "in_stock") Boolean inStock) {
+        return new ResponseEntity<>(productService.get(inStock), HttpStatus.OK);
+    }
+
+    @GetMapping("/sort")
+    public ResponseEntity<Collection<Product>> getSort(
+            @RequestParam(value = "sorting_parameter") String name,
+            @RequestParam(value = "ascending") Boolean ascending,
+            @RequestParam(value = "limit", required = false) Integer limit) {
+
+        return new ResponseEntity<>(
+                (name.equals("price")) ? ((limit != null) ? productService.getSortByPrice(ascending, limit)
+                        : productService.getSortByPrice(ascending))
+                        : ((limit != null) ? productService.getSortByName(ascending, limit)
+                        : productService.getSortByName(ascending)),
+                HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

@@ -31,12 +31,53 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Collection<Product> get() {
-        Collection<Product> result = (Collection<Product>) productDAO.findAll();
-        return entityMapper.toResponse(result);
+        return entityMapper.toResponse((Collection<Product>) productDAO.findAll());
+    }
+
+    @Override
+    public Collection<Product> get(String searchTerm) {
+        return entityMapper.toResponse(productDAO.findByNameContainingIgnoreCase(searchTerm));
+    }
+
+    @Override
+    public Collection<Product> get(Double price, String sign) {
+        return entityMapper.toResponse((sign.equals("=")) ? productDAO.findByPrice(price)
+                : (sign.equals("<") ? productDAO.findByPriceLessThan(price)
+                : productDAO.findByPriceGreaterThan(price)));
+    }
+
+    @Override
+    public Collection<Product> get(Double minPrice, Double maxPrice) {
+        return entityMapper.toResponse(productDAO.findByPriceBetween(minPrice, maxPrice));
+    }
+
+    @Override
+    public Collection<Product> get(Boolean inStock) {
+        return entityMapper.toResponse((inStock) ? productDAO.findByInStockTrue() : productDAO.findByInStockFalse());
     }
 
     public Product get(UUID id) {
         return entityMapper.toResponse(productUtil.getEntity(id));
+    }
+
+    public Collection<Product> getSortByPrice(Boolean ascending) {
+        return entityMapper.toResponse((ascending) ? productDAO.findAllByOrderByPriceAsc()
+                : productDAO.findAllByOrderByPriceDesc());
+    }
+
+    public Collection<Product> getSortByPrice(Boolean ascending, Integer limit) {
+        return entityMapper.toResponse((ascending) ? productDAO.findFirstByRowsByOrderByPriceAscLimit(limit)
+                : productDAO.findFirstByRowsOrderByPriceDescLimit(limit));
+    }
+
+    public Collection<Product> getSortByName(Boolean ascending) {
+        return entityMapper.toResponse((ascending) ? productDAO.findAllByOrderByNameAsc()
+                : productDAO.findAllByOrderByNameDesc());
+    }
+
+    public Collection<Product> getSortByName(Boolean ascending, Integer limit) {
+        return entityMapper.toResponse((ascending) ? productDAO.findFirstRowsByOrderByNameAscLimit(limit)
+                : productDAO.findFirstByRowsByOrderByNameDescLimit(limit));
     }
 
     @Transactional
